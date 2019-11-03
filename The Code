@@ -1,0 +1,87 @@
+import datetime
+import hashlib
+import time
+import random
+
+
+class Block:
+    blockNo = 0
+    data = None
+    next = None
+    hash = None
+    nonce = 0
+    previous_hash = 0x0
+    timestamp = datetime.datetime.now()
+
+    def __init__(self, data):
+        self.data = random.randint(1,1000000)
+
+    def hash(self):
+        h = hashlib.sha256()
+        h.update(
+        str(self.nonce).encode('utf-8') +
+        str(self.data).encode('utf-8') +
+        str(self.previous_hash).encode('utf-8') +
+        str(self.timestamp).encode('utf-8') +
+        str(self.blockNo).encode('utf-8')
+        )
+        return h.hexdigest()
+
+    def __str__(self):
+        return "Block Hash: " + str(self.hash()) + "\nBlockNo: " + str(self.blockNo) + "\nBlock Data: " + str(self.data) + "\nHashes: " + str(self.nonce) + "\n--------------"
+
+class Blockchain:
+
+    diff = 5
+    maxNonce = 2**32
+    target = 2 ** (256-diff)
+
+    block = Block("Genesis")
+    dummy = head = block
+
+    def add(self, block):
+
+        block.previous_hash = self.block.hash()
+        block.blockNo = self.block.blockNo + 1
+
+        self.block.next = block
+        self.block = self.block.next
+
+    def mine(self, block):
+        for n in range(self.maxNonce):
+            if int(block.hash(), 16) <= self.target:
+                start_time = time.time()
+                if block.data in validChain:
+                    elapsed_time = time.time() - start_time
+                    print ('Sorry. This element had already been added to the chain, please enter a different element.')
+                    print ('elapsed time for validation = ' + str(elapsed_time))
+                    validationTimeslist.insert(n, elapsed_time)
+                    break
+                else:
+                    self.add(block)
+                    print(block)
+                    validChain.add(block.data)
+                    elapsed_time = time.time() - start_time
+                    print('The Blockchain now is updated to have the following transactions:')
+                    print(validChain)
+                    print ('elapsed time for vlidation and addition = ' + str(elapsed_time))
+                    validationTimeslist.insert(n, elapsed_time)
+                    break
+            else:
+                block.nonce += 1
+
+blockchain = Blockchain()
+validChain = set(["0"])
+validationTimeslist = ["0"]
+totalElapseTime=0
+avgValidationTime = 0
+for n in range(50):
+    blockchain.mine(Block("Block " + str(n+1)))
+    totalElapseTime = float(totalElapseTime) + float(validationTimeslist[n])
+    avgValidationTime = float(totalElapseTime/(n+1))
+    print (*validationTimeslist, sep = "\n")
+    print ('Average time spent for block validation = ' + str(avgValidationTime))
+
+while blockchain.head != None:
+    print(blockchain.head)
+    blockchain.head = blockchain.head.next

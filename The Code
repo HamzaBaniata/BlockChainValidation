@@ -47,10 +47,6 @@ class Blockchain:
         self.block.next = block
         self.block = self.block.next
         
-        
-    counter = 0
-        
-        
     def mine(self, block):
         
         for n in range(self.maxNonce):
@@ -68,7 +64,7 @@ class Blockchain:
                     #print(block)
                     validChain.add(block.data)
                     elapsed_time = (time.time() - start_time) * 100000
-                   # print('The Blockchain now is updated to have the following transactions:'), print(validChain)
+                    #print('The Blockchain now is updated to have the following transactions:'), print(validChain)
                     #print ('elapsed time for vlidation and addition = ' + str(elapsed_time))
                     validationTimeslist.insert(n, elapsed_time)
                     

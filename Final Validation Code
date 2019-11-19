@@ -58,12 +58,14 @@ class Blockchain:
 
     def mine(self, block):
         while len(block.transactions) != numberOfTransactions:
-            tx_data = random.randint(0, 10000000000000000000)
+            #tx_data = random.randint(0, 10000000000000000000)
+            tx_data = input('Please enter the transaction value you want to add\n')
             start_time = time.time()
             if tx_data in self.validList:
                 elapsed_time = time.time() - start_time
-                print('Sorry. This element had already been added to the chain, please enter a different element.')
-                print('elapsed time for validation = ' + str(elapsed_time))
+                print('Sorry. This transaction is invalid because it had been already added to the chain before, please enter a different element.')
+                #print('elapsed time for validation = ' + str(elapsed_time))
+                print(" ------------------------------------------------")
                 self.validation_time = self.validation_time + elapsed_time
                 self.numberOfInvalidTransactions = self.numberOfInvalidTransactions + 1
             else:
@@ -75,20 +77,20 @@ class Blockchain:
             if int(block.hash(), 16) > self.target:
                 block.nonce += 1
             else:
-                #print('Transactions in Block number (' + str(n) + ') are:' )
-                #print(*block.transactions, sep = ",\n")
+                print('Transactions in Block number (' + str(n) + ') are:' )
+                print(*block.transactions, sep = ",\n")
                 print("The nonce equals " + str(block.nonce))
                 print("The hash is " + str(block.hash()))
                 break
 
 
 blockchain = Blockchain()
-numberOfTransactions = 10000
-numberOfBlocks = 10000
+numberOfTransactions = 2
+numberOfBlocks = 10
 star_time_for_every_thing = time.time()
 for n in range(numberOfBlocks):
     blockchain.mine(Block("Block " + str(n + 1)))
-    print("Block number " + str(n) + " is successfully mined \n-----------------------------------------------------------")
+    print("Block number " + str(n) + " is successfully mined \n------------------------------------------------")
 
     
 avgValidationTime = blockchain.validation_time / len(blockchain.validList)

@@ -37,7 +37,7 @@ class Block:
 
 
 class Blockchain:
-    diff = 5
+    diff = 13
     maxNonce = 2 ** 32
     target = 2 ** (256 - diff)
     blocks = [Block("Genesis")]
@@ -57,7 +57,7 @@ class Blockchain:
 
     def mine(self, block):
         while len(block.transactions) != numberOfTransactions:
-            tx_data = random.randint(0, 10)
+            tx_data = random.randint(0, 100000000000)
             # tx_data = input('Please enter the transaction value you want to add\n')
             start_time = time.time()
             if tx_data in self.validList:
@@ -73,25 +73,25 @@ class Blockchain:
                 block.add_transaction(tx_data)
                 self.validList.add(tx_data)
                 self.validation_time = self.validation_time + elapsed_time
-            for i in range(self.maxNonce):
-                if int(block.hash(), 16) > self.target:
-                    block.nonce += 1
-                else:
-                   # print('Transactions in Block number (' + str(n) + ') are:' )
-                    #print(*block.transactions, sep = ",\n")
-                    #print("The nonce equals " + str(block.nonce))
-                    #print("The hash is " + str(block.hash()))
-                    break
-        print ('Last added transaction validation time = ' + str(elapsed_time))
+        for i in range(self.maxNonce):
+            if int(block.hash(), 16) > self.target:
+                block.nonce += 1
+            else:
+                #print('Transactions in Block number (' + str(n) + ') are:' )
+                #print(*block.transactions, sep = ",\n")
+                 print("The nonce equals " + str(block.nonce))
+                 print("The hash is " + str(block.hash()))
+                 break
 
 
 blockchain = Blockchain()
-numberOfTransactions = 10
+numberOfTransactions = 10000
 numberOfBlocks = 10
 start_time_for_every_thing = time.time()
 for n in range(numberOfBlocks):
     blockchain.mine(Block("Block " + str(n + 1)))
-    print("Block number " + str(n+1) + " is successfully mined \n------------------------------------------------")
+    print("All Transactions in Block number " + str(n+1) + " are valid \n------------------------------------------------")
+    print('Average Block validation time for  ' + str(n+1) + ' Blocks  = ' + str(blockchain.validation_time / (n+1)))
 
 avgValidationTime = blockchain.validation_time / (len(blockchain.validList) + blockchain.numberOfInvalidTransactions)
 print ('Number of processed transactions = ' + str(len(blockchain.validList) + blockchain.numberOfInvalidTransactions))

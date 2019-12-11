@@ -1,0 +1,149 @@
+import datetime
+import hashlib
+import time
+import random
+import pymysql.cursors
+
+class Block:
+    hash = None
+
+    def __init__(self, name):
+        self.name = name
+        self.transactions = list()
+        self.blockNo = 0
+        self.next = None
+        self.nonce = 0
+        self.previous_hash = 0x0
+        self.timestamp = datetime.datetime.now()
+
+    def hash(self):
+        h = hashlib.sha256()
+        h.update(
+            str(self.nonce).encode('utf-8') +
+            str(self.transactions).encode('utf-8') +
+            str(self.previous_hash).encode('utf-8') +
+            str(self.timestamp).encode('utf-8') +
+            str(self.blockNo).encode('utf-8')
+        )
+        return h.hexdigest()
+
+    def add_transaction(self, transaction):
+        self.transactions.append(transaction)
+
+    def __str__(self):
+        return "\n--------------\n" + "\nBlockNo: " + str(self.blockNo) + "\nBlock Data: " + str(
+            self.transactions) + "\nBlock Hash: " + str(
+            self.hash()) + "\nNumber of Hashes performed to solve the puzzle: " + str(self.nonce)
+
+
+class Blockchain:
+    diff = 2
+    maxNonce = 2 ** 32
+    target = 2 ** (256 - diff)
+    top_block = Block("Genesis")
+    validList = set()
+    validation_time = 0
+    numberOfInvalidTransactions = 0
+    database_mod = True
+
+    def __init__(self, database):
+        self.database = database
+
+    def add(self, block):
+        block.previous_hash = self.top_block.hash()
+        block.blockNo = self.top_block.blockNo + 1
+        self.top_block = block
+
+    def add_to_validList(self, tx_data):
+        if not self.database_mod:
+            self.validList.add(tx_data)
+        else:
+            with self.database.cursor() as cursor:
+                sql = "INSERT INTO validation(value) VALUES (%s)"
+                cursor.execute(sql, (tx_data,))
+                self.database.commit()
+
+    def validate(self, tx_data):
+        if not self.database_mod:
+            return tx_data in self.validList
+        else:
+            with self.database.cursor() as cursor:
+                sql = "SELECT * FROM validation WHERE value=%s"
+                cursor.execute(sql, (tx_data,))
+                self.database.commit()
+                return cursor.fetchone() is not None
+
+    def mine(self, block):
+        while len(block.transactions) != numberOfTransactions:
+            tx_data = random.randint(0, 100000000000000000000000)
+            # tx_data = input('Please enter the transaction value you want to add\n')
+            start_time = time.time()
+            if self.validate(tx_data):
+                elapsed_time = time.time() - start_time
+                print(
+                    'Sorry. The transaction ' + str(tx_data) + ' is invalid because it had been already added to the chain before, please enter a different element.')
+                # print('elapsed time for validation = ' + str(elapsed_time))
+                print(" ------------------------------------------------")
+                self.validation_time = self.validation_time + elapsed_time
+                self.numberOfInvalidTransactions = self.numberOfInvalidTransactions + 1
+            else:
+                elapsed_time = time.time() - start_time
+                block.add_transaction(tx_data)
+                self.add_to_validList(tx_data)
+                self.validation_time = self.validation_time + elapsed_time
+        for i in range(self.maxNonce):
+            if int(block.hash(), 16) > self.target:
+                block.nonce += 1
+            else:
+                #print('Transactions in Block number (' + str(n) + ') are:' )
+                #print(*block.transactions, sep = ",\n")
+                 print("The nonce equals " + str(block.nonce))
+                 print("The hash is " + str(block.hash()))
+                 break
+
+
+# Database connection
+database = pymysql.connect(
+    host="localhost",
+    user="admin",
+    password="admin",
+    db="blockchain"
+)
+
+with database.cursor() as cursor:
+    cursor.execute("TRUNCATE validation")
+    database.commit()
+
+blockchain = Blockchain(database)
+numberOfTransactions = 10
+numberOfBlocks = 50
+start_time_for_every_thing = time.time()
+for n in range(numberOfBlocks):
+    blockchain.mine(Block("Block " + str(n + 1)))
+    print("All Transactions in Block number " + str(n+1) + " are valid \n------------------------------------------------")
+    print('Average Block validation time for  ' + str(n+1) + ' Blocks  = ' + str(blockchain.validation_time / (n+1)))
+
+
+if blockchain.database_mod:
+    with database.cursor() as cursor:
+        sql = "SELECT COUNT(*) FROM validation"
+        cursor.execute(sql)
+        database.commit()
+        total_transactions = int(cursor.fetchone()[0])
+
+        avgValidationTime = blockchain.validation_time / (total_transactions + blockchain.numberOfInvalidTransactions)
+        print( 'Number of processed transactions = ' + str(total_transactions + blockchain.numberOfInvalidTransactions))
+else:
+    avgValidationTime = blockchain.validation_time / (len(blockchain.validList) + blockchain.numberOfInvalidTransactions)
+    print ('Number of processed transactions = ' + str(len(blockchain.validList) + blockchain.numberOfInvalidTransactions))
+
+
+
+print ('Total time spent for validating ' + str(numberOfBlocks * numberOfTransactions + blockchain.numberOfInvalidTransactions) + ' transactions = ' + str(
+    blockchain.validation_time))
+print ('Average transaction validation time for ' + str(numberOfBlocks * numberOfTransactions + blockchain.numberOfInvalidTransactions) + ' transactions = ' + str(avgValidationTime))
+print ('Average Block validation time for  ' + str(numberOfBlocks) + ' Blocks  = ' + str(
+    blockchain.validation_time / numberOfBlocks))
+end_time_for_every_thing = (time.time() - start_time_for_every_thing)
+print ('Total time of the experiment (including puzzle solving) = ' + str(end_time_for_every_thing))
+print ('Number of invalid transactions = ' + str(blockchain.numberOfInvalidTransactions))

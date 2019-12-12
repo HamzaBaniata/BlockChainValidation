@@ -1,10 +1,21 @@
 # BlockChainValidation
-A simple transaction validation simulator. 
+A Blockchain transaction validation simulator. 
 
-To modify the attributes/parameters of the experiment:
 
-1-change the mining puzzle difficaulty at line '40'.
+*System Requirements:
 
-2-change the number of transactions per block at line '88'. 
+1- Python 3.8 (First Code).
 
-3-change the number of blocks evaluated at line '89'.
+2- MySQL DataBase system (Second Code).
+
+3-XAMPP Apatche(Second Code).
+
+
+
+*To modify the attributes/parameters of the experiment:
+
+1-change the mining puzzle difficaulty (at line '40' in both codes).
+
+2-change the number of transactions per block (at line '88' OR line '118'). 
+
+3-change the number of blocks evaluated (at line '89' OR line '119)'.

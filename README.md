@@ -19,3 +19,7 @@ A Blockchain transaction validation simulator.
 2-change the number of transactions per block (at line '88' OR line '118'). 
 
 3-change the number of blocks evaluated (at line '89' OR line '119)'.
+
+4- change the number of validators (at line '89')
+
+5- change the total number of network nodes (at line '90')

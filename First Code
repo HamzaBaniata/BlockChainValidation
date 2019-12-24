@@ -85,9 +85,14 @@ class Blockchain:
 
 
 blockchain = Blockchain()
-numberOfTransactions = 10000
+traditionalOrPFBVM = False
+numberOfValidators = int(input('The number of nodes authorized to validate transactions in the systems =?\n'))
+totalNumberOfNetworkNodes = int(input('The total number of nodes in the network =?\n'))
+energyConsumption = numberOfValidators/totalNumberOfNetworkNodes
+numberOfTransactions = 10
 numberOfBlocks = 10
 start_time_for_every_thing = time.time()
+traditionalOrPFBVM = input("Choose the system please (traditional system=0 or PF-BVM=1): ")
 for n in range(numberOfBlocks):
     blockchain.mine(Block("Block " + str(n + 1)))
     print("All Transactions in Block number " + str(n+1) + " are valid \n------------------------------------------------")
@@ -101,5 +106,8 @@ print ('Average transaction validation time for ' + str(numberOfBlocks * numberO
 print ('Average Block validation time for  ' + str(numberOfBlocks) + ' Blocks  = ' + str(
     blockchain.validation_time / numberOfBlocks))
 end_time_for_every_thing = (time.time() - start_time_for_every_thing)
-print ('Total time of the experiment (including puzzle solving) = ' + str(end_time_for_every_thing))
+print('Total time of the experiment (including puzzle solving) = ' + str(end_time_for_every_thing))
+print('Total energy consumption of the system = ' + str("%.2f" % (energyConsumption*100) + '%'))
+if energyConsumption == 1:
+    print('The energy consumption indicates that the system is not energy economic')
 print ('Number of invalid transactions = ' + str(blockchain.numberOfInvalidTransactions))

@@ -2,6 +2,8 @@
 A Blockchain transaction validation simulator. 
 
 
+This code is part of a research paper titled: "PF-BVM: A Privacy-aware Fog-enhanced Blockchain Validation Mechanism" accepted for publication in the CLOSER-2020 Conference.
+
 *System Requirements:
 
 1- Python 3.8 (First Code).
